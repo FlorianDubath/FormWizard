@@ -6,11 +6,11 @@
 
 .header, .footer {
 	display:block;
-	width:calc(100% - 6px);
+	width:calc(100% - 20px);
 	overflow-x:scroll;
 	border-bottom: solid 1px blue;
 	background-color:white;
-	padding:3px;
+	padding:10px;
 }
 
 .bc_btn {
@@ -66,11 +66,11 @@
 
 .sect_title{
 	font-weight:700;
-	margin-bottom:5px;
+	margin-bottom:10px;
 }
 .sect_descr{
 	font-style:italic;
-	margin-bottom:5px;
+	margin-bottom:10px;
 }
 
 .fld{

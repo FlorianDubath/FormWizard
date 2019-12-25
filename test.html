@@ -140,10 +140,11 @@ const getDomField = function(section_index, field_index, field) {
 }
 
 class FormWizard {
-  constructor(container_id, model) {
+  constructor(container_id, model, callback) {
     this.container_id = container_id;
     this.model = model;
     this.initialized = false;
+    this.callback = callback;
     
     this.initialize();
     this.showSection(0);
@@ -201,10 +202,12 @@ class FormWizard {
   	 	sect_title.appendChild(document.createTextNode(section.title));
   	 	sect_title.classList.add("sect_title");
   	 	sect_div.appendChild(sect_title);
+  	 	if (section.description!==undefined && section.description!="") {
   	 	var sect_descr = document.createElement("div");
-  	 	sect_descr.appendChild(document.createTextNode(section.description));
-  	 	sect_descr.classList.add("sect_descr");
-  	 	sect_div.appendChild(sect_descr);
+  	 		sect_descr.appendChild(document.createTextNode(section.description));
+  	 		sect_descr.classList.add("sect_descr");
+  	 		sect_div.appendChild(sect_descr);
+  	 	}
   
   	 	var field_index;
   	 	for (field_index in section.field) {
@@ -328,7 +331,7 @@ class FormWizard {
   } 
   
   readValues() {
-  	for (var section_index =0;sect_index<  this.model["formWizardObject"].section.length; sect_index++) {
+  	for (var section_index =0;section_index<  this.model["formWizardObject"].section.length; section_index++) {
   		var section = this.model["formWizardObject"].section[section_index];
     	var field_index;
   		for (field_index in section.field) {
@@ -349,21 +352,18 @@ class FormWizard {
   	if (!valid) {
   		alert("At least one section has some missing or invalid fields. You need to complete them.")
   	} else {
-  		this.endAction();
+  		this.readValues();
+    	this.callback(this.model)
   	}
   }
   
-  endAction() {
-    this.sreadValues();
-  	alert("end");
-  }
 }
 
 
 
 
 
-var form_wizard = new FormWizard("container", model);
+var form_wizard = new FormWizard("container", model, function(completed_model){alert('Completed!');});
   
 </script>
 
