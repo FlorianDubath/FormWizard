@@ -1,0 +1,52 @@
+<formWizardObject>
+	<title>Example 1</title>
+	<version>0.0.1</version>
+	<creation_date>2019-12-25</creation_date>
+	
+	<section>
+		<title>Identification</title>
+		<decription></decription>
+		<field>
+			<label>Name</label>
+			<type>string</type>
+			<mandatory>True</mandatory>
+			<value></value>
+		</field>
+		<field>
+			<label>Last Name</label>
+			<type>String</type>
+			<mandatory>True</mandatory>
+			<value></value>
+		</field>
+		<field>
+			<label>Birth Date</label>
+			<type>date</type>
+			<mandatory>False</mandatory>
+			<value></value>
+		</field>
+	</section>
+	
+	<section>
+		<title>Address</title>
+		<decription></decription>
+		<field>
+			<label>Street and Number</label>
+			<type>string</type>
+			<mandatory>True</mandatory>
+			<value></value>
+		</field>
+		<field>
+			<label>ZIP Code</label>
+			<type>string</type>
+			<mandatory>True</mandatory>
+			<value></value>
+		</field>
+		<field>
+			<label>Country</label>
+			<type>country</type>
+			<mandatory>True</mandatory>
+			<value></value>
+		</field>
+	</section>
+	
+</formWizardObject>

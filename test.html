@@ -1,0 +1,158 @@
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<!--<link rel="stylesheet" type="text/css" href="resources/FormWizard.css" />-->
+	
+    <title>FormWizard's test page</title>
+</head>
+<body style="background-color:blue;">
+	<div id="container" style="background-color:white; margin:20px;border:solid 1px black;height:calc(100% - 40px);"></div>
+</body >
+
+ <script type="text/javascript">
+  	var model = {
+  "formWizardObject": {
+    "title": "Example 1",
+    "version": "0.0.1",
+    "creation_date": "2019-12-25",
+    "section": [
+      {
+        "title": "Identification",
+        "field": [
+          {
+            "label": "Name",
+            "type": "string",
+            "mandatory": "True"
+          },
+          {
+            "label": "Last Name",
+            "type": "String",
+            "mandatory": "True"
+          },
+          {
+            "label": "Birth Date",
+            "type": "date",
+            "mandatory": "False"
+          }
+        ]
+      },
+      {
+        "title": "Address",
+        "field": [
+          {
+            "label": "Street and Number",
+            "type": "string",
+            "mandatory": "True"
+          },
+          {
+            "label": "ZIP Code",
+            "type": "string",
+            "mandatory": "True"
+          },
+          {
+            "label": "Country",
+            "type": "country",
+            "mandatory": "True"
+          }
+        ]
+      }
+    ]
+  }
+};
+
+
+class BcButton {
+	constructor(form_wizard, index) {
+		this.form_wizard = form_wizard;
+		this.index = index;
+	}
+	
+	getDom() {
+		var btn = document.createElement("div");  
+  	 	btn.appendChild(document.createTextNode((this.index+1)));
+  	    btn.id="btn_s"+this.index;
+  	 	btn.classList.add("bc_btn");
+  	 	btn.form_wizard = this.form_wizard;
+  	 	btn.index = this.index;
+  	 	
+ 		if (btn.addEventListener) {
+        	btn.addEventListener('click', function() {
+        	    this.form_wizard.showSection(this.index);
+        	}, false);
+    	} else if (btn.attachEvent) {
+        	btn.attachEvent('onclick', function() {
+            	this.form_wizard.showSection(this.index);
+        	});
+    	}
+    	return btn;
+	}
+}
+
+class FormWizard {
+  constructor(container_id, model) {
+    this.container_id = container_id;
+    this.model = model;
+    this.initialized = false;
+    
+    this.initialize();
+    this.showSection(0);
+    
+  }
+  
+  initialize() {
+  	 if (this.initialized) {
+  	 	return;
+  	 }
+  	 this.current_section = -1;
+  	 
+  	 this.container = document.getElementById(this.container_id); 
+  	 // Create the bread crumb
+  	 var header = document.createElement("div");
+  	 header.id="header";
+  	 header.classList.add("header");
+  	 
+  	 for (var index=0; index < model["formWizardObject"].section.length; index++) {
+  	 	 var btn = new BcButton(this, index);
+  	 	 header.appendChild(btn.getDom());
+  	 }
+  	 
+  	 var btn_close = document.createElement("div");  
+  	 btn_close.classList.add("bc_btn_close");
+  	 btn_close.form_wizard = this;
+  	 btn_close.appendChild(document.createTextNode("102"));
+  	 if (btn_close.addEventListener) {
+        	btn_close.addEventListener('click', function() {
+        	    this.form_wizard.close();
+        	}, false);
+    	} else if (btn_close.attachEvent) {
+        	btn_close.attachEvent('onclick', function() {
+            	this.form_wizard.close();
+        	});
+    	}
+  	 header.appendChild(btn_close);
+  	 this.container.appendChild(header);
+  	 
+  	 // add the sections
+  	 this.initialized=true;
+  }
+  
+  
+  showSection(section_index){
+  	alert(section_index);
+  } 
+  
+  close(){
+  	alert("ddd");
+  } 
+}
+
+
+
+
+
+var form_wizard = new FormWizard("container", model);
+  
+</script>
+
+</html>

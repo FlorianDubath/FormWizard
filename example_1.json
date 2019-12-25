@@ -1,0 +1,49 @@
+{
+  "formWizardObject": {
+    "title": "Example 1",
+    "version": "0.0.1",
+    "creation_date": "2019-12-25",
+    "section": [
+      {
+        "title": "Identification",
+        "field": [
+          {
+            "label": "Name",
+            "type": "string",
+            "mandatory": "True"
+          },
+          {
+            "label": "Last Name",
+            "type": "String",
+            "mandatory": "True"
+          },
+          {
+            "label": "Birth Date",
+            "type": "date",
+            "mandatory": "False"
+          }
+        ]
+      },
+      {
+        "title": "Address",
+        "field": [
+          {
+            "label": "Street and Number",
+            "type": "string",
+            "mandatory": "True"
+          },
+          {
+            "label": "ZIP Code",
+            "type": "string",
+            "mandatory": "True"
+          },
+          {
+            "label": "Country",
+            "type": "country",
+            "mandatory": "True"
+          }
+        ]
+      }
+    ]
+  }
+}
