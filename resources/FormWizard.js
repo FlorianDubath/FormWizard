@@ -198,7 +198,6 @@ class FormWizard {
   	 btn_close.classList.add("fw_btn"); 
   	 btn_close.classList.add("bc_btn_close");
   	 btn_close.form_wizard = this;
-  	 btn_close.appendChild(document.createTextNode("X"));
   	 if (btn_close.addEventListener) {
         	btn_close.addEventListener('click', function() {
         	    this.form_wizard.close();
@@ -246,7 +245,6 @@ class FormWizard {
   	 footer_div.classList.add("footer");
   	 
   	 var btn_prev = document.createElement("div");  
-  	 btn_prev.appendChild(document.createTextNode("Prev"));
   	 btn_prev.id="btn_prev";
   	 btn_prev.classList.add("fw_btn");
   	 btn_prev.classList.add("fw_btn_prev");
@@ -264,7 +262,6 @@ class FormWizard {
   	 footer_div.appendChild(btn_prev);
   	 
   	 var btn_next = document.createElement("div");  
-  	 btn_next.appendChild(document.createTextNode("Next"));
   	 btn_next.id="btn_next";
   	 btn_next.classList.add("fw_btn");
   	 btn_next.classList.add("fw_btn_next");
@@ -284,7 +281,6 @@ class FormWizard {
 
   	 
   	 var btn_end = document.createElement("div");  
-  	 btn_end.appendChild(document.createTextNode("End"));
   	 btn_end.id="btn_end";
   	 btn_end.classList.add("fw_btn");
   	 btn_end.classList.add("fw_btn_end");
