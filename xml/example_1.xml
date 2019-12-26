@@ -3,6 +3,14 @@
 	<version>0.0.1</version>
 	<creation_date>2019-12-25</creation_date>
 	
+	<list>
+		<name>Country</name>
+		<item>France</item>
+		<item>Germany</item>
+		<item>Italy</item>
+		<item>Switzerland</item>
+	</list>
+	
 	<section>
 		<title>Identification</title>
 		<decription></decription>

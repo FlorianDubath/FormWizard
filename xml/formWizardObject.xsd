@@ -7,6 +7,15 @@
           <xs:element name="version" type="xs:string" />
           <xs:element name="creation_date" type="xs:date" />
           
+          <xs:element name="list" maxOccurs="unbounded">
+        	<xs:complexType>
+          		<xs:sequence>
+            		<xs:element name="name" type="xs:string"/>
+            		<xs:element name="item" type="xs:string" maxOccurs="unbounded"/>
+          		</xs:sequence>
+            </xs:complexType>
+           </xs:element> 
+          
           <xs:element name="section" maxOccurs="unbounded">
         	<xs:complexType>
           		<xs:sequence>

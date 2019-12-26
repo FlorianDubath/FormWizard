@@ -1,7 +1,6 @@
 .inner_cont {
   position:relative;
   width:100%;
-  height:100%;
 }
 
 .header, .footer {
@@ -16,10 +15,14 @@
 .bc_btn {
 	display:inline-block;
 	border: solid 1px blue;
-	border-radius: 10px;
+	border-radius: 20px;
 	background-color:#DDDDFF;
 	padding:3px 10px 3px 10px;
 	margin:0px 3px 0px 3px;
+}
+
+.bc_btn:hover,.bc_btn:active{
+	background-color:#AAAAFF;
 }
 
 .bc_btn_not_view {
@@ -28,30 +31,46 @@
 	border-color: #9999FF;
 }
 
+.bc_btn_not_view:hover,.bc_btn_not_view:active{
+	background-color:#EEEEFF;
+}
+
 .bc_btn_current {
 	background-color:#7777FF;
 }
 
+.bc_btn_current:hover,.bc_btn_current:active{
+	background-color:#7777FF;
+}
+
 .bc_btn_invalid {
+	border-radius: 0px;
 	background-color:#FF0000;
 }
 
+.bc_btn_invalid:hover,.bc_btn_invalid:active{
+	background-color:#FFAA00;
+}
 
-.bc_btn_close, .btn_next, .btn_end {
+
+.fw_btn {
 	display:inline-block;
-	float:right;
 	padding:3px 10px 3px 10px;
 	margin:0px 3px 0px 3px;
 }
 
-.btn_hidden {
+.bc_btn_close{
+	float:right;
+}
+
+.fw_btn_hidden {
 	display:none;
 }
 
 
 .sect_cont {
   display:block;
-  height:calc(100% - 40px);
+  max-height:calc(100% - 60px);
   width:100%;
   overflow-y:scroll;
 }
@@ -79,6 +98,14 @@
 
 .lbl_invalid{
 	color:red;
+}
+
+.fld_input{
+	background-color:#DDDDDD;
+}
+
+.fld_txtarea{
+	width:100%;
 }
 
 
