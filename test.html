@@ -3,12 +3,13 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<link rel="stylesheet" type="text/css" href="resources/FormWizard.css" />
-	
+
     <title>FormWizard's test page</title>
 </head>
 <body style="background-color:blue;">
 	<div id="container" style="background-color:white; margin:20px;border:solid 1px black;height:calc(100% - 40px);"></div>
 </body >
+<script src="resources/jspdf/jspdf.min.js"></script> 
 <script type="text/javascript" src="resources/FormWizard.js"></script>
 <script type="text/javascript">
   	var model = {
@@ -87,6 +88,48 @@
 };
 
 
+savePdf = function(model, font, file_name ){
+	if ( font===undefined){
+		font='helvetica';
+	}
+	
+	var doc = new jsPDF('p','mm','a4');
+	doc.setFont(font);
+	doc.setFontType('bold');
+	doc.setFontSize(12);
+	doc.text(40, 40, model["formWizardObject"].title);
+    doc.setFontSize(10);
+	const line_height = 7;
+	const total_height= 220;
+	const max_lines = Math.floor(total_height/line_height);
+	const line_number = 1;
+	var high = 40 + line_number*line_height;
+	var section_index;
+  	for (section_index in model["formWizardObject"].section) {
+  	   var section = model["formWizardObject"].section[section_index];
+	   doc.setFontType('bold');
+	   doc.text(40, high, section.title);
+	   high += line_height;
+  	   doc.setFontType('normal');
+  	   var field_index;
+  	   for (field_index in section.field) {
+  		   var field = section.field[field_index];
+  		   if (field.type!="text") {
+  		   	  doc.text(40, high, field.label + ": " + field.value);
+  		   	  line_number++;
+	   	      high = 40 + line_number*line_height;
+  		   }
+
+	  }
+  	}
+	
+    doc.save(file_name);
+	
+}
+
+
+
+
 
 
 var trad = {
@@ -99,7 +142,7 @@ var form_wizard = new FormWizard("container",
                                   model, 
                                   trad, 
                                   function(){alert('Exited!');}, 
-                                  function(completed_model){alert('Completed!');}
+                                  function(completed_model){savePdf(completed_model, 'helvetica', 'test.pdf' );}
                                 );
   
 </script>
