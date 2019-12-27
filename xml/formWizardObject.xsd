@@ -3,33 +3,46 @@
 	<xs:element name="formWizardObject">
       <xs:complexType>
         <xs:sequence>
-          <xs:element name="title" type="xs:string" />
-          <xs:element name="version" type="xs:string" />
-          <xs:element name="creation_date" type="xs:date" />
+          <xs:element name="title" type="xs:string"  />
+          <xs:element name="description" type="xs:string"  minOccurs="0" maxOccurs="1" />
+          <xs:element name="version" type="xs:string"   />
+          <xs:element name="creation_date" type="xs:date"  />
           
-          <xs:element name="list" maxOccurs="unbounded">
+          <xs:element name="list" minOccurs="0" maxOccurs="unbounded">
         	<xs:complexType>
           		<xs:sequence>
-            		<xs:element name="name" type="xs:string"/>
-            		<xs:element name="item" type="xs:string" maxOccurs="unbounded"/>
+            		<xs:element name="name" type="xs:string"  />
+            		<xs:element name="item" type="xs:string" minOccurs="2" maxOccurs="unbounded"/>
           		</xs:sequence>
             </xs:complexType>
            </xs:element> 
           
-          <xs:element name="section" maxOccurs="unbounded">
+          <xs:element name="section" minOccurs="1" maxOccurs="unbounded">
         	<xs:complexType>
           		<xs:sequence>
-            		<xs:element name="title" type="xs:string"/>
-            		<xs:element name="decription" type="xs:string" />
+            		<xs:element name="title" type="xs:string" />
+            		<xs:element name="decription" type="xs:string" minOccurs="0" maxOccurs="1" />
             		
-            		<xs:element name="field" maxOccurs="unbounded">
+            		<xs:element name="field" minOccurs="1" maxOccurs="unbounded">
             			<xs:complexType>
-          					<xs:all>
+          					<xs:sequence>
           						<xs:element name="label" type="xs:string"/>
           						<xs:element name="type" type="xs:string"/>
           						<xs:element name="mandatory" type="xs:string"/>
-          						<xs:element name="value" type="xs:string"/>
-          					</xs:all>
+          						<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1" />
+          						
+          						<xs:element name="condition"  minOccurs="0" maxOccurs="1">	
+          						  <xs:complexType>
+          						  	 <xs:sequence> 
+          						  	    <xs:element name="name" type="xs:string"/>
+          						  	    <xs:element name="value_true" type="xs:string" minOccurs="0" maxOccurs="1" />
+          						  	    <xs:element name="value_false" type="xs:string" minOccurs="0" maxOccurs="1" />
+          					         </xs:sequence>
+          						  </xs:complexType> 
+        						</xs:element> 
+        					
+          						<xs:element name="show_on_condition" type="xs:string" minOccurs="0" maxOccurs="1" />
+          					</xs:sequence>
         				</xs:complexType> 
         			</xs:element> 
           		</xs:sequence>

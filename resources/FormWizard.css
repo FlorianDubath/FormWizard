@@ -121,6 +121,10 @@
 	margin-bottom:10px;
 }
 
+.cond_excluded{
+	display:none;
+}
+
 .lbl_invalid{
 	color:red;
 }

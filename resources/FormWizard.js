@@ -60,6 +60,7 @@ class FormWizard {
     	this.trad.close = "Do you want to exit this wizard without completing it (data that you already entered will be lost).";
     }
     
+    this.conditions = [];
     this.initialize();
     this.showSection(0);
     
@@ -94,11 +95,16 @@ class FormWizard {
   	 }
   }
   
+  
+ 
+  
   getDomField(section_index, field_index, field) {
   	 	var div_field = document.createElement("div");
 
   	 	div_field.id="f_s"+section_index+"_f"+field_index;
   	 	div_field.classList.add("fld");
+  	 	this.addToCondition(field, div_field.id);
+  	 	
   	 	var fld_lbl =  document.createElement("div");
   	 	fld_lbl.appendChild(document.createTextNode(field.label + getMandatorySymbol(field)));
   	 	fld_lbl.classList.add("fld_lbl");
@@ -132,6 +138,8 @@ class FormWizard {
   	 			fld_input.classList.add("fld_date");
   	 			break;
   	 		default:
+  	 		    // enumaration (list) case
+  	 		    
   	 		 	if (this.model["formWizardObject"].list!== undefined) {
   	 				for (var list_counter = 0; list_counter < this.model["formWizardObject"].list.length; list_counter++){
   	 					const list = this.model["formWizardObject"].list[list_counter];
@@ -140,6 +148,11 @@ class FormWizard {
   	 		    			fld_input.id = "fi_s"+section_index+"_f"+field_index;
   	 		    			fld_input.classList.add("fld_input");
   	 						fld_input.classList.add("fld_drop");
+  	 						
+  	 						if (this.addCondition(field, fld_input.id)) {
+  	 							fld_input.form_wizard = this;
+  	 							fld_input.onchange = function(){this.form_wizard.applyConditions();};
+  	 						}
   	 						
   	 						const item_value = list.item[item_counter];
   	 						var item = document.createElement("option");
@@ -161,6 +174,7 @@ class FormWizard {
   	 					}
   	 				}
   	 			}
+  	 			
  
   	 			break;
   	 	}
@@ -171,6 +185,57 @@ class FormWizard {
   	 	div_field.appendChild(fld_input);
   	 	return div_field;
   	 	
+  }
+  
+  addCondition(condition_field, input_id) {
+  	if (condition_field.condition!==undefined){
+  		var fields = [];
+  		if ( condition_field.condition.name in this.conditions){
+  			fields = this.conditions[condition_field.condition.name].fields;
+  		}
+  		var cond = {"input_id":input_id, "fields":fields};
+  		if (condition_field.condition.value_true!==undefined){
+  				cond.value_true = condition_field.condition.value_true;
+  		} else if (condition_field.condition.value_false!==undefined){
+  				cond.value_false = condition_field.condition.value_false;
+  		}
+  		
+  		this.conditions[condition_field.condition.name] = cond;
+  		return true;
+  	}
+  	return false;
+  }
+  
+  addToCondition(field, field_div_id) {
+  	if (field.show_on_condition!==undefined) {
+  	 if (!(field.show_on_condition in this.conditions)){
+  	 	this.conditions[field.show_on_condition] = {"fields":[]};
+  	 }
+  	 
+  	 this.conditions[field.show_on_condition].fields.push(field_div_id);
+  	}
+  }
+  
+  applyConditions(){
+  	var cond_index;
+  	for (cond_index in this.conditions){
+  		const cond = this.conditions[cond_index];
+  		var valid = this.isConditionValid(cond);
+  		
+  		for (var fld_index=0; fld_index< cond.fields.length; fld_index++){
+  			var fld_div = document.getElementById(cond.fields[fld_index]);
+  			if (valid) {
+  				fld_div.classList.remove("cond_excluded");
+  			} else {
+  				fld_div.classList.add("cond_excluded");
+  			}
+  		}
+  	}
+  }
+  
+  isConditionValid(cond){
+  	const curr_value = document.getElementById(cond.input_id).value;
+  	return cond.value_true!==undefined ? cond.value_true == curr_value: cond.value_false != curr_value;
   }
   
   initialize() {
@@ -308,15 +373,17 @@ class FormWizard {
   	for (field_index in section.field) {
   		var field = section.field[field_index];
   		if (field.mandatory.toLowerCase()=="true") {
-  			const input = document.getElementById("fi_s"+section_index+"_f"+field_index);
-  			const fld_valid =  input.value!==undefined && input.value.trim()!="";
-  			var lbl = document.getElementById("fl_s"+section_index+"_f"+field_index);
-  			if (fld_valid) {
-  				lbl.classList.remove("lbl_invalid");
-  			} else {
-  				lbl.classList.add("lbl_invalid");
+  		   if (field.show_on_condition === undefined || this.isConditionValid(this.conditions[field.show_on_condition])) {
+  				const input = document.getElementById("fi_s"+section_index+"_f"+field_index);
+  				const fld_valid =  input.value!==undefined && input.value.trim()!="";
+  				var lbl = document.getElementById("fl_s"+section_index+"_f"+field_index);
+  				if (fld_valid) {
+  					lbl.classList.remove("lbl_invalid");
+  				} else {
+  					lbl.classList.add("lbl_invalid");
+  				}
+  				valid &= fld_valid;
   			}
-  			valid &= fld_valid;
   		}
   	}
 	return valid;  
@@ -329,6 +396,7 @@ class FormWizard {
  
   
   showSection(section_index){
+    this.applyConditions();
     if (this.current_section>=0) {
       // when invalid ask for completion
        const valid = this.isSectionValid(this.current_section);
@@ -384,7 +452,12 @@ class FormWizard {
   		var section = this.model["formWizardObject"].section[section_index];
     	var field_index;
   		for (field_index in section.field) {
-  			section.field[field_index].value = document.getElementById("fi_s"+section_index+"_f"+field_index).value;
+  			var field = section.field[field_index];
+  		 	if (field.show_on_condition === undefined || this.isConditionValid(this.conditions[field.show_on_condition])) {
+  				section.field[field_index].value = document.getElementById("fi_s"+section_index+"_f"+field_index).value;
+  			} else {
+  				section.field[field_index].value = undefined;
+  			}
   		}
   	}
   }
@@ -409,3 +482,131 @@ class FormWizard {
   }
   
 }
+
+
+// you need to include jspdf package if you want to use this part (https://parall.ax/products/jspdf)
+// logo should be a 45x30 mm base64 encoded jpeg or "undefined"
+savePdf = function(model, font, logo, file_name ){
+	if ( font===undefined){
+		font='helvetica';
+	}
+	
+	const margin_top = 30;
+	const line_height = 5.5;
+	const total_height= 220; 
+	const max_lines = Math.floor(total_height/line_height);
+
+	const margin_left = 40;
+	const column_width = 58;
+	const column_separation = 4;
+	const total_column = 2;
+	
+	var line_number = 0;
+	var column_counter =0;
+	
+	var doc = new jsPDF('p','mm','a4');
+	
+	if (logo!== undefined) {
+	 doc.addImage(logo, 'JPEG', 5, 5, 45, 30)
+	}
+	
+	newPage = function() {
+		line_number = 0;
+		column_counter = 0;
+		doc.addPage();
+		if (logo!== undefined) {
+		   doc.addImage(logo, 'JPEG', 5, 5, 45, 30)
+		}
+	}
+	
+	addCentered = function(text, max_width) {
+		var lines = doc.splitTextToSize(text, max_width, {});
+        for (var index=0; index<lines.length; index++){
+        	var textWidth = doc.getStringUnitWidth(lines[index]) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+        	var textOffset = (doc.internal.pageSize.width - textWidth) / 2;
+        	var v = margin_top + line_number*line_height;
+        	line_number++;
+        	doc.text(textOffset, v, lines[index]);
+        }
+		
+	}
+	
+	addElement = function(text){
+		addColSpanElement(text, 1);
+	}
+	
+	addColSpanElement= function(text, col_span) {
+	    // check there is enough column left
+		if (column_counter+col_span>total_column){
+			column_counter = 0;
+			line_number++;
+			if (line_number>max_lines) {
+				newPage();
+			}
+		}
+		
+		const max_w = col_span*column_width + (col_span-1)*column_separation;
+		const h = margin_left + column_counter*(column_width + column_separation);
+		
+		if (doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor >max_w) {
+			var lines = doc.splitTextToSize(text, max_w, {});
+			
+			for (var index=0; index<lines.length; index++){
+				if (index!=0) {
+					line_number++;
+					if (line_number>max_lines) {
+						newPage();
+					}
+				}
+				const v = margin_top + line_number*line_height;
+				doc.text(h, v, lines[index]);
+				
+			}
+		} else {
+			const v = margin_top + line_number*line_height;
+			doc.text(h, v, text);
+		}
+		
+		if (column_counter + col_span >= total_column) {
+			column_counter = 0;
+			line_number++;
+		} else {
+			column_counter += col_span;
+		}
+		
+		if (line_number>max_lines) {
+			newPage();
+		}
+	}
+	
+	doc.setFont(font);
+	doc.setFontType('bold');
+	doc.setFontSize(12);
+	addCentered(model["formWizardObject"].title, 2*column_width + column_separation);
+	doc.setFontSize(10);
+  	doc.setFontType('normal');
+	addCentered(model["formWizardObject"].description, column_width);
+	line_number++;
+	var section_index;
+  	for (section_index in model["formWizardObject"].section) {
+  	   var section = model["formWizardObject"].section[section_index];
+	   doc.setFontType('bold');
+	   addColSpanElement( section.title,2);
+	  
+  	   doc.setFontType('normal');
+  	   var field_index;
+  	   for (field_index in section.field) {
+  	   	   
+  		   const field = section.field[field_index];
+  		   if (field.show_on_condition === undefined || field.value!==undefined) {
+  		   	 const colspan = field.type!="text"? 1: 2;
+  		   	 addColSpanElement(field.label + ": " + field.value, colspan);
+  		   }
+	  }
+  	}
+	
+    doc.save(file_name);
+	
+}
+
+
