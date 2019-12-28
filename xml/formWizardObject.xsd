@@ -30,6 +30,7 @@
           						<xs:element name="type" type="xs:string"/>
           						<xs:element name="mandatory" type="xs:string"/>
           						<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1" />
+          						<xs:element name="manuscript" type="xs:string" minOccurs="0" maxOccurs="1" />
           						
           						<xs:element name="condition"  minOccurs="0" maxOccurs="1">	
           						  <xs:complexType>

@@ -102,7 +102,20 @@
             "label": "Your opinion",
             "type": "text",
             "mandatory": "True"
-          }
+          },
+          {
+            "label": "Date",
+            "type": "string",
+            "mandatory": "True",
+            "manuscript":"True",
+            }, 
+            {
+            "label": "Signature",
+            "type": "string",
+            "mandatory": "True",
+            "manuscript":"True",
+            }
+          
         ]
       }
     ]
@@ -123,7 +136,7 @@ var form_wizard = new FormWizard("container",
                                   model, 
                                   trad, 
                                   function(){alert('Exited!');}, 
-                                  function(completed_model){savePdf(completed_model, 'helvetica', logo_data, 'test.pdf' );alert('Completed!');}
+                                  function(completed_model){savePdf(completed_model, 'helvetica', 2, logo_data, 'test.pdf' );alert('Completed!');}
                                 );
   
 </script>

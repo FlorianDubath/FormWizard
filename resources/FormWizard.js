@@ -299,7 +299,9 @@ class FormWizard {
   	 	var field_index;
   	 	for (field_index in section.field) {
   	 		var field = section.field[field_index];
-  	 		sect_div.appendChild(this.getDomField(section_index, field_index, field));
+  	 		if (field.manuscript === undefined || field.manuscript.toLowerCase()=="false") {
+  	 			sect_div.appendChild(this.getDomField(section_index, field_index, field));
+  	 		}
   	 	}
   	 	
   	 	
@@ -372,7 +374,7 @@ class FormWizard {
     var field_index;
   	for (field_index in section.field) {
   		var field = section.field[field_index];
-  		if (field.mandatory.toLowerCase()=="true") {
+  		if (field.mandatory.toLowerCase()=="true" && (field.manuscript === undefined || field.manuscript.toLowerCase()=="false")) {
   		   if (field.show_on_condition === undefined || this.isConditionValid(this.conditions[field.show_on_condition])) {
   				const input = document.getElementById("fi_s"+section_index+"_f"+field_index);
   				const fld_valid =  input.value!==undefined && input.value.trim()!="";
@@ -453,10 +455,12 @@ class FormWizard {
     	var field_index;
   		for (field_index in section.field) {
   			var field = section.field[field_index];
-  		 	if (field.show_on_condition === undefined || this.isConditionValid(this.conditions[field.show_on_condition])) {
-  				section.field[field_index].value = document.getElementById("fi_s"+section_index+"_f"+field_index).value;
-  			} else {
-  				section.field[field_index].value = undefined;
+  			if (field.manuscript === undefined || field.manuscript.toLowerCase()=="false") {
+  		 		if (field.show_on_condition === undefined || this.isConditionValid(this.conditions[field.show_on_condition])) {
+  					section.field[field_index].value = document.getElementById("fi_s"+section_index+"_f"+field_index).value;
+  				} else {
+  					section.field[field_index].value = undefined;
+  				}
   			}
   		}
   	}
@@ -486,10 +490,13 @@ class FormWizard {
 
 // you need to include jspdf package if you want to use this part (https://parall.ax/products/jspdf)
 // logo should be a 45x30 mm base64 encoded jpeg or "undefined"
-savePdf = function(model, font, logo, file_name ){
+savePdf = function(model, font, total_column, logo, file_name ){
 	if ( font===undefined){
 		font='helvetica';
 	}
+	
+	
+	var doc = new jsPDF('p','mm','a4');
 	
 	const margin_top = 30;
 	const line_height = 5.5;
@@ -497,14 +504,13 @@ savePdf = function(model, font, logo, file_name ){
 	const max_lines = Math.floor(total_height/line_height);
 
 	const margin_left = 40;
-	const column_width = 58;
 	const column_separation = 4;
-	const total_column = 2;
+
+	const column_width = (doc.internal.pageSize.width -2*margin_left -column_separation*(total_column-1))/total_column;
 	
 	var line_number = 0;
 	var column_counter =0;
 	
-	var doc = new jsPDF('p','mm','a4');
 	
 	if (logo!== undefined) {
 	 doc.addImage(logo, 'JPEG', 5, 5, 45, 30)
@@ -525,21 +531,24 @@ savePdf = function(model, font, logo, file_name ){
         	var textWidth = doc.getStringUnitWidth(lines[index]) * doc.internal.getFontSize() / doc.internal.scaleFactor;
         	var textOffset = (doc.internal.pageSize.width - textWidth) / 2;
         	var v = margin_top + line_number*line_height;
-        	line_number++;
+        	line_number+=0.9;
+        	if (line_number>max_lines) {
+				newPage();
+			}
         	doc.text(textOffset, v, lines[index]);
         }
 		
 	}
 	
 	addElement = function(text){
-		addColSpanElement(text, 1);
+		addColSpanElement(text, 1, false);
 	}
 	
-	addColSpanElement= function(text, col_span) {
+	addColSpanElement= function(text, col_span, add_feed_line) {
 	    // check there is enough column left
 		if (column_counter+col_span>total_column){
 			column_counter = 0;
-			line_number++;
+			line_number+=1;
 			if (line_number>max_lines) {
 				newPage();
 			}
@@ -547,29 +556,36 @@ savePdf = function(model, font, logo, file_name ){
 		
 		const max_w = col_span*column_width + (col_span-1)*column_separation;
 		const h = margin_left + column_counter*(column_width + column_separation);
-		
-		if (doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor >max_w) {
+		var textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+		if (textWidth >max_w) {
 			var lines = doc.splitTextToSize(text, max_w, {});
 			
 			for (var index=0; index<lines.length; index++){
 				if (index!=0) {
-					line_number++;
+					line_number+=0.9;
 					if (line_number>max_lines) {
 						newPage();
 					}
 				}
 				const v = margin_top + line_number*line_height;
 				doc.text(h, v, lines[index]);
+				if (add_feed_line && index == lines.length-1) {
+					textWidth = doc.getStringUnitWidth(lines[index]) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+					doc.line(h + textWidth, v, h + max_w, v);
+				}
 				
 			}
 		} else {
 			const v = margin_top + line_number*line_height;
 			doc.text(h, v, text);
+			if (add_feed_line){
+				doc.line(h + textWidth, v, h + max_w, v);
+			}
 		}
 		
 		if (column_counter + col_span >= total_column) {
 			column_counter = 0;
-			line_number++;
+			line_number+=1;
 		} else {
 			column_counter += col_span;
 		}
@@ -579,6 +595,7 @@ savePdf = function(model, font, logo, file_name ){
 		}
 	}
 	
+    doc.setLineWidth(0.1)
 	doc.setFont(font);
 	doc.setFontType('bold');
 	doc.setFontSize(12);
@@ -586,12 +603,13 @@ savePdf = function(model, font, logo, file_name ){
 	doc.setFontSize(10);
   	doc.setFontType('normal');
 	addCentered(model["formWizardObject"].description, column_width);
-	line_number++;
+	line_number+=1;
 	var section_index;
   	for (section_index in model["formWizardObject"].section) {
   	   var section = model["formWizardObject"].section[section_index];
 	   doc.setFontType('bold');
-	   addColSpanElement( section.title,2);
+	   line_number+=0.5;
+	   addColSpanElement( section.title, total_column, false);
 	  
   	   doc.setFontType('normal');
   	   var field_index;
@@ -599,13 +617,23 @@ savePdf = function(model, font, logo, file_name ){
   	   	   
   		   const field = section.field[field_index];
   		   if (field.show_on_condition === undefined || field.value!==undefined) {
-  		   	 const colspan = field.type!="text"? 1: 2;
-  		   	 addColSpanElement(field.label + ": " + field.value, colspan);
+  		   	 const colspan = field.type!="text"? 1: total_column;
+  		   	 if (field.manuscript === undefined || field.manuscript.toLowerCase()=="false") {
+  		   		 addColSpanElement(field.label + ": " + field.value, colspan, false);
+  		   	 } else {
+  		   	 	if (column_counter == 0) {
+  		   	 		line_number+=0.5;
+  		   	 	}
+  		   	 	addColSpanElement(field.label + ": ", colspan, true);
+  		   	 }
   		   }
 	  }
   	}
 	
-    doc.save(file_name);
+	if (file_name!==undefined){
+    	doc.save(file_name);
+    }
+    return doc;
 	
 }
 
