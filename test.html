@@ -10,6 +10,7 @@
 	<div id="container" style="background-color:white; margin:20px;border:solid 1px black;height:calc(100% - 40px);"></div>
 </body >
 <script src="resources/jspdf/jspdf.min.js"></script> 
+<script src="resources/qrcodejs/qrcode.min.js"></script> 
 <script type="text/javascript" src="resources/FormWizard.js"></script>
 <script type="text/javascript">
   	var model = {
@@ -132,11 +133,13 @@ var trad = {
 	"close":"Voulez-vous quiter cet assistant? Les données que vous avez déjà entrées seront perdues."
 };
 
+var qr_text = "This page contains the same information than the previous ones but encoded in a way that speed up our work as we can scan the QRs to get the information you entered.";
+
 var form_wizard = new FormWizard("container", 
                                   model, 
                                   trad, 
                                   function(){alert('Exited!');}, 
-                                  function(completed_model){savePdf(completed_model, 'helvetica', 2, logo_data, 'test.pdf' );alert('Completed!');}
+                                  function(completed_model){savePdf(completed_model, 'helvetica', 2, logo_data, qr_text, 'test.pdf' );alert('Completed!');}
                                 );
   
 </script>

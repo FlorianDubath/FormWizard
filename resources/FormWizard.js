@@ -487,10 +487,38 @@ class FormWizard {
   
 }
 
+simplifyObject = function(section){
+	var new_object = {"title":section.title, "fields":{}};
+	var field_index;
+  	for (field_index in section.field) {
+  		new_object.fields[section.field[field_index].label]=section.field[field_index].value;
+  	}
+	return new_object;
+}
+
+addDomQRs = function(model){
+	var section_index;
+  	for (section_index in model["formWizardObject"].section) {
+  	   var section = model["formWizardObject"].section[section_index];
+  	   var div_qr = document.createElement("div");  
+  	   div_qr.id="qr_s"+section_index;
+  	   div_qr.classList.add("qr");
+  	   document.body.appendChild(div_qr);
+  	   var qrcode = new QRCode(div_qr, {width : 300,height : 300});
+  	   qrcode.makeCode(JSON.stringify(simplifyObject(section)));	
+   }
+}
 
 // you need to include jspdf package if you want to use this part (https://parall.ax/products/jspdf)
+// you need to include qrcodejs package if you want to add the QR's (https://github.com/davidshimjs/qrcodejs)
 // logo should be a 45x30 mm base64 encoded jpeg or "undefined"
-savePdf = function(model, font, total_column, logo, file_name ){
+savePdf = function(model, font, total_column, logo, add_qr_text, file_name ){
+
+   if (add_qr_text!=undefined) {
+   		addDomQRs(model);  
+   }
+
+
 	if ( font===undefined){
 		font='helvetica';
 	}
@@ -629,11 +657,29 @@ savePdf = function(model, font, total_column, logo, file_name ){
   		   }
 	  }
   	}
-	
+  	
+setTimeout(function() {
+	if (add_qr_text!=undefined) {
+		for (section_index in model["formWizardObject"].section) {
+			if (section_index % 6==0){
+   		  			 newPage();
+   		  			 line_number = -1;
+					 column_counter =0;
+					 addCentered(add_qr_text, 110);
+   		  	}
+   			var imgData = document.getElementById("qr_s"+section_index).getElementsByTagName('img')[0].src;
+   			var line = Math.floor((section_index % 6) / 2);
+   			var col = (section_index % 6) % 2;
+            doc.addImage(imgData, 'PNG', 29 + col*(70 + 10), 50 + line*(70 + 10), 70, 70);
+        } 
+   	}
+   		 
 	if (file_name!==undefined){
-    	doc.save(file_name);
-    }
-    return doc;
+    	 doc.save(file_name);
+   	}
+   	},200);
+    
+	
 	
 }
 
