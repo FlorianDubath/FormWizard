@@ -545,7 +545,7 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name ){
 	}
 	
 	newPage = function() {
-		line_number = 0;
+		line_number = 2;
 		column_counter = 0;
 		doc.addPage();
 		if (logo!== undefined) {
@@ -638,21 +638,29 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name ){
 	   doc.setFontType('bold');
 	   line_number+=0.5;
 	   addColSpanElement( section.title, total_column, false);
-	  
+       
   	   doc.setFontType('normal');
+       if (section.show_description!==undefined){ 
+	    addColSpanElement( section.description, total_column, false);
+       }
+	  
   	   var field_index;
   	   for (field_index in section.field) {
   	   	   
   		   const field = section.field[field_index];
-  		   if (field.show_on_condition === undefined || field.value!==undefined) {
-  		   	 const colspan = field.type!="text"? 1: total_column;
+  		   if ((field.show_on_condition === undefined || field.value!==undefined) && field.value!=="") {
+  		   	 var colspan = field.type!="text"? 1: total_column;
+             if (field.span!== undefined){
+                colspan = Math.min(field.span,total_column);
+             }
+             const label = field.pdflabel=== undefined ? field.label:field.pdflabel;
   		   	 if (field.manuscript === undefined || field.manuscript.toLowerCase()=="false") {
-  		   		 addColSpanElement(field.label + ": " + field.value, colspan, false);
+  		   		 addColSpanElement(label + ": " + field.value, colspan, false);
   		   	 } else {
   		   	 	if (column_counter == 0) {
   		   	 		line_number+=0.5;
   		   	 	}
-  		   	 	addColSpanElement(field.label + ": ", colspan, true);
+  		   	 	addColSpanElement(label + ": ", colspan, true);
   		   	 }
   		   }
 	  }
