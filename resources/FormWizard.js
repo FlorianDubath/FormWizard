@@ -63,6 +63,9 @@ class FormWizard {
     this.conditions = [];
     this.initialize();
     this.showSection(0);
+    if (trad.open != undefined) {
+        alert(trad.open);
+    }
     
   }
   
@@ -499,13 +502,17 @@ simplifyObject = function(section){
 addDomQRs = function(model){
 	var section_index;
   	for (section_index in model["formWizardObject"].section) {
+        try {
   	   var section = model["formWizardObject"].section[section_index];
   	   var div_qr = document.createElement("div");  
   	   div_qr.id="qr_s"+section_index;
   	   div_qr.classList.add("qr");
   	   document.body.appendChild(div_qr);
   	   var qrcode = new QRCode(div_qr, {width : 300,height : 300});
-  	   qrcode.makeCode(JSON.stringify(simplifyObject(section)));	
+  	   qrcode.makeCode(JSON.stringify(simplifyObject(section)));
+        } catch(e){
+            
+        }
    }
 }
 
