@@ -34,6 +34,7 @@ const getMandatorySymbol = function(field) {
 
 class FormWizard {
   constructor(container_id, model, trad, exit_callback,complete_callback) {
+    
     this.container_id = container_id;
     this.model = model;
     this.normalizeModel();
@@ -66,6 +67,11 @@ class FormWizard {
     if (trad.open != undefined) {
         alert(trad.open);
     }
+    
+    
+    window.onbeforeunload = function() {
+            return this.trad.close;
+    };  
     
   }
   
@@ -469,8 +475,13 @@ class FormWizard {
   	}
   }
   
+
+  
    close(){
   	if (confirm(this.trad.close)){
+        window.onbeforeunload = function() {
+            return;
+        };
   		this.exit_callback();
   	} 
   } 
@@ -484,7 +495,10 @@ class FormWizard {
   		alert(this.trad.incomplete)
   	} else {
   		this.readValues();
-    	this.complete_callback(this.model)
+        window.onbeforeunload = function() {
+            return;
+        };
+    	this.complete_callback(this.model);
   	}
   }
   
