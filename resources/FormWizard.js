@@ -298,6 +298,16 @@ class FormWizard {
   	 	sect_title.appendChild(document.createTextNode(section.title));
   	 	sect_title.classList.add("sect_title");
   	 	sect_div.appendChild(sect_title);
+  	 	if (section.image!==undefined && section.image!="") {
+            var dom_img = document.createElement("img");
+            dom_img.classList.add("sect_img");
+            dom_img.onload = function() {
+                dom_img.style.maxWidth  = 2*this.width,
+                dom_img.style.maxHeight = 2*this.height;
+            }
+            dom_img.src = section.image;
+            sect_div.appendChild(dom_img);
+        }
   	 	if (section.description!==undefined && section.description!="") {
   	 	var sect_descr = document.createElement("div");
   	 		sect_descr.appendChild(document.createTextNode(section.description));

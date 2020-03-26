@@ -108,6 +108,11 @@
 	padding:10px;
 }
 
+.sect_img{
+    margin:10px auto 20px auto;
+    width:100%;
+}
+
 .sect_title{
 	font-weight:700;
 	margin-bottom:10px;
