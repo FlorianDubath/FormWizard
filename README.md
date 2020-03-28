@@ -1,5 +1,5 @@
 # FormWizard
-This project create a wizard out of a json object describing the fields to be completed. All the navigation of one page of the wizard to the other, the validation and (if requested) pdf generation are done on the browser. The wizard do *NOT* communicate with the server.
+This project create a wizard out of a json object describing the fields to be completed. All the navigation of one page of the wizard to the other, the validation and (if requested) pdf generation are done on the browser. The wizard do *NOT* communicate with the server unless requested (and then it send the final pdf).
 
 ## Functionality
 Gives a div id and a json, the FormWizard will create the form into the div. 
@@ -12,7 +12,7 @@ A function is provided to convert the json completed with user-provided values i
 ## specification
 * N section(s) to be filled.
 * Each section has an arbitrary number of fields
-* Fields can be of type: Single line text, Multiline text, Date or Enumeration
+* Fields can be of type: Single line text, Multiline text, Date or Enumeration (dropdown or radio-button)
 * Enumerations are listed into the json
 * Fields can be specified as mandatory and/or pre-filled. 
 * One can define a test on an enumeration field, either by providing a value to be match or a value not to be match
