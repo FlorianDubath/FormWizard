@@ -6,8 +6,12 @@ class BcButton {
 	}
 	
 	getDom() {
-		var btn = document.createElement("div");  
-  	 	btn.appendChild(document.createTextNode((this.index+1)));
+		var btn = document.createElement("div"); 
+        var text=this.index+1;
+         if (!this.form_wizard.show_section_numbering){
+             text='';
+         }
+  	 	btn.appendChild(document.createTextNode(text));
   	    btn.id="btn_s"+this.index;
   	 	btn.classList.add("bc_btn");
   	 	btn.form_wizard = this.form_wizard;
@@ -33,10 +37,14 @@ const getMandatorySymbol = function(field) {
 
 
 class FormWizard {
-  constructor(container_id, model, trad, exit_callback,complete_callback) {
+  constructor(container_id, model, image_folder, trad, exit_callback, complete_callback) {
     
     this.container_id = container_id;
     this.model = model;
+    this.image_folder = image_folder;
+    if(this.image_folder!="" && this.image_folder.length>0 && !this.image_folder.endsWith("/")){
+        this.image_folder=this.image_folder+"/";
+    }
     this.normalizeModel();
     this.initialized = false;
     this.exit_callback = exit_callback;
@@ -59,6 +67,18 @@ class FormWizard {
     	this.trad.close = trad.close;
     } else {
     	this.trad.close = "Do you want to exit this wizard without completing it (data that you already entered will be lost).";
+    }
+    
+    if (trad !== undefined && trad.exit_confirm != undefined) {
+    	this.trad.exit_confirm = trad.exit_confirm;
+    } else {
+    	this.trad.close = undefined;
+    }
+    
+    this.show_section_numbering = true;
+    
+    if (this.model.formWizardObject["hide_wizzard_numbering"]==="true" || this.model.formWizardObject["hide_wizzard_numbering"]==="True"){
+        this.show_section_numbering = false;
     }
     
     this.conditions = [];
@@ -129,6 +149,8 @@ class FormWizard {
   	 				fld_input.value = field.value;
   	 			}
   	 			fld_input.classList.add("fld_txt");
+                
+  	 	        div_field.appendChild(fld_input);
   	 			break;
   	 		case 'text':
   	 			fld_input = document.createElement("textarea");
@@ -138,6 +160,8 @@ class FormWizard {
   	 			if (field.value !== undefined) {
   	 				fld_input.value = field.value;
   	 			}
+                
+  	 	        div_field.appendChild(fld_input);
   	 			break;
   	 		case 'date':
   	 			fld_input.type="date";  	 			
@@ -145,43 +169,83 @@ class FormWizard {
   	 				fld_input.value = field.value;
   	 			}
   	 			fld_input.classList.add("fld_date");
+                
+  	 	        div_field.appendChild(fld_input);
   	 			break;
   	 		default:
   	 		    // enumaration (list) case
   	 		    
   	 		 	if (this.model["formWizardObject"].list!== undefined) {
-  	 				for (var list_counter = 0; list_counter < this.model["formWizardObject"].list.length; list_counter++){
-  	 					const list = this.model["formWizardObject"].list[list_counter];
-  	 					if (list.name == field.type) {
-  	 						fld_input = document.createElement("select");
-  	 		    			fld_input.id = "fi_s"+section_index+"_f"+field_index;
-  	 		    			fld_input.classList.add("fld_input");
-  	 						fld_input.classList.add("fld_drop");
-  	 						
-  	 						if (this.addCondition(field, fld_input.id)) {
-  	 							fld_input.form_wizard = this;
-  	 							fld_input.onchange = function(){this.form_wizard.applyConditions();};
-  	 						}
-  	 						
-  	 						const item_value = list.item[item_counter];
-  	 						var item = document.createElement("option");
-  	 						item.classList.add("fld_option");
-  	 						item.value = "";
-  	 						item.text = "";
-  	 						fld_input.add(item);
-  	 						for (var item_counter = 0; item_counter < list.item.length; item_counter++){
-  	 							const item_value = list.item[item_counter];
-  	 							var item = document.createElement("option");
-  	 							item.classList.add("fld_option");
-  	 							item.value = item_value;
-  	 							item.text = item_value;
-  	 							if ( item_value ==  field.value) {
-  	 								item.selected = true;
-  	 							}
-  	 							fld_input.add(item);
-  	 						}
-  	 					}
-  	 				}
+                    if (field.rb) {
+                        for (var list_counter = 0; list_counter < this.model["formWizardObject"].list.length; list_counter++){
+      	 					const list = this.model["formWizardObject"].list[list_counter];
+      	 					if (list.name == field.type) {
+                                const fld_name = "fi_s"+section_index+"_f"+field_index;
+                                const has_condition = this.addCondition(field, fld_name);
+      	 							
+                                for (var item_counter = 0; item_counter < list.item.length; item_counter++){
+                                    var div_rb_input = document.createElement("span");		
+                                    div_rb_input.classList.add("radio");
+                                    var rb_input = document.createElement("input");
+                                    rb_input.type="radio"
+                                    rb_input.name=fld_name;
+                                    rb_input.id = fld_name+"_i"+item_counter;
+                                    rb_input.value = list.item[item_counter];
+                                    rb_input.classList.add("fld_input");
+      	 						    rb_input.classList.add("fld_rb");
+                                    if ( rb_input.value ==  field.value) {
+      	 								item.checked = true;
+      	 							}
+                                    
+                                    if (has_condition){
+                                        rb_input.form_wizard = this;
+      	 							    rb_input.onchange = function(){this.form_wizard.applyConditions();};
+      	 						    }
+                                
+          	 						
+                                    div_rb_input.appendChild(rb_input);
+                                    div_rb_input.appendChild(document.createTextNode(rb_input.value));
+  	 	                            div_field.appendChild(div_rb_input);
+                                }
+      	 					}
+      	 				}
+                    } else {
+      	 				for (var list_counter = 0; list_counter < this.model["formWizardObject"].list.length; list_counter++){
+      	 					const list = this.model["formWizardObject"].list[list_counter];
+      	 					if (list.name == field.type) {
+      	 						fld_input = document.createElement("select");
+      	 		    			fld_input.id = "fi_s"+section_index+"_f"+field_index;
+      	 		    			fld_input.name = "fi_s"+section_index+"_f"+field_index;
+      	 		    			fld_input.classList.add("fld_input");
+      	 						fld_input.classList.add("fld_drop");
+      	 						
+      	 						if (this.addCondition(field, fld_input.name)) {
+      	 							fld_input.form_wizard = this;
+      	 							fld_input.onchange = function(){this.form_wizard.applyConditions();};
+      	 						}
+      	 						
+      	 						const item_value = list.item[item_counter];
+      	 						var item = document.createElement("option");
+      	 						item.classList.add("fld_option");
+      	 						item.value = "";
+      	 						item.text = "";
+      	 						fld_input.add(item);
+      	 						for (var item_counter = 0; item_counter < list.item.length; item_counter++){
+      	 							const item_value = list.item[item_counter];
+      	 							var item = document.createElement("option");
+      	 							item.classList.add("fld_option");
+      	 							item.value = item_value;
+      	 							item.text = item_value;
+      	 							if ( item_value ==  field.value) {
+      	 								item.selected = true;
+      	 							}
+      	 							fld_input.add(item);
+      	 						}
+      	 					}
+      	 				}
+                        
+  	 	                div_field.appendChild(fld_input);
+                    }
   	 			}
   	 			
  
@@ -191,18 +255,17 @@ class FormWizard {
 
   	 	
   	 	
-  	 	div_field.appendChild(fld_input);
   	 	return div_field;
   	 	
   }
   
-  addCondition(condition_field, input_id) {
+  addCondition(condition_field, input_name) {
   	if (condition_field.condition!==undefined){
   		var fields = [];
   		if ( condition_field.condition.name in this.conditions){
   			fields = this.conditions[condition_field.condition.name].fields;
   		}
-  		var cond = {"input_id":input_id, "fields":fields};
+  		var cond = {"input_name":input_name, "fields":fields};
   		if (condition_field.condition.value_true!==undefined){
   				cond.value_true = condition_field.condition.value_true;
   		} else if (condition_field.condition.value_false!==undefined){
@@ -214,6 +277,9 @@ class FormWizard {
   	}
   	return false;
   }
+  
+   
+  
   
   addToCondition(field, field_div_id) {
   	if (field.show_on_condition!==undefined) {
@@ -242,9 +308,29 @@ class FormWizard {
   	}
   }
   
+  
+   readRbFieldByName(name){
+      const rbs = document.getElementsByName(name);
+      var value = "";
+      if (rbs.length==1) {
+          value = rbs[0].value;
+      } else {
+          for (var i=0; i< rbs.length;i++){
+              if (rbs[i].checked) {
+                 value = rbs[i].value;
+              }
+          }
+      }
+      
+  	  return  value;
+      		
+  }
+  
   isConditionValid(cond){
-  	const curr_value = document.getElementById(cond.input_id).value;
+  	const curr_value = this.readRbFieldByName(cond.input_name);
   	return cond.value_true!==undefined ? cond.value_true == curr_value: cond.value_false != curr_value;
+   
+    //todo rb case
   }
   
   initialize() {
@@ -264,7 +350,8 @@ class FormWizard {
   	 header.classList.add("header");
   	 
   	 for (var index=0; index < this.model["formWizardObject"].section.length; index++) {
-  	 	 var btn = new BcButton(this, index);
+         
+         var btn = new BcButton(this, index);
   	 	 header.appendChild(btn.getDom());
   	 }
   	 
@@ -302,10 +389,10 @@ class FormWizard {
             var dom_img = document.createElement("img");
             dom_img.classList.add("sect_img");
             dom_img.onload = function() {
-                dom_img.style.maxWidth  = 2*this.width,
-                dom_img.style.maxHeight = 2*this.height;
+                this.style.maxWidth  = Math.round(1.2*this.naturalWidth)+'px';
+                this.style.maxHeight  = Math.round(1.2*this.naturalHeight)+'px';
             }
-            dom_img.src = section.image;
+            dom_img.src = this.image_folder+section.image;
             sect_div.appendChild(dom_img);
         }
   	 	if (section.description!==undefined && section.description!="") {
@@ -374,11 +461,24 @@ class FormWizard {
   	 btn_end.form_wizard = this;
   	 if (btn_end.addEventListener) {
         	btn_end.addEventListener('click', function() {
-        	    this.form_wizard.completed();
+        	    if (this.form_wizard.trad.exit_confirm!==undefined){
+                    if (confirm(this.form_wizard.trad.exit_confirm)){
+            	        this.form_wizard.completed();
+                   	 }
+                } else {
+            	    this.form_wizard.completed();
+                }
         	}, false);
      } else if (btn_end.attachEvent) {
         	btn_end.attachEvent('onclick', function() {
-            	this.form_wizard.completed();
+                if (this.form_wizard.trad.exit_confirm!==undefined){
+                    if (confirm(this.form_wizard.trad.exit_confirm)){
+            	        this.form_wizard.completed();
+                   	 }
+                } else {
+            	    this.form_wizard.completed();
+                }
+                
         	});
      }	
   	 footer_div.appendChild(btn_end);
@@ -386,6 +486,18 @@ class FormWizard {
   	 this.container.appendChild(sect_cont_div);
   	 this.initialized=true;
   }
+  
+ 
+  
+  readRbFieldValue(section_index,field_index){
+  	  return  this.readRbFieldByName("fi_s"+section_index+"_f"+field_index); 		
+  }
+  
+  validateRbField(section_index,field_index){
+      const value = this.readRbFieldValue(section_index,field_index)
+  	  return  value!==undefined && value.trim()!="";  		
+  }
+  
   
   isSectionValid(section_index) {
     var valid=true;
@@ -395,8 +507,14 @@ class FormWizard {
   		var field = section.field[field_index];
   		if (field.mandatory.toLowerCase()=="true" && (field.manuscript === undefined || field.manuscript.toLowerCase()=="false")) {
   		   if (field.show_on_condition === undefined || this.isConditionValid(this.conditions[field.show_on_condition])) {
-  				const input = document.getElementById("fi_s"+section_index+"_f"+field_index);
-  				const fld_valid =  input.value!==undefined && input.value.trim()!="";
+  				var fld_valid = false;
+                if (field.rb) {
+                   fld_valid = this.validateRbField(section_index,field_index);
+                } else {
+                    const input = document.getElementById("fi_s"+section_index+"_f"+field_index);
+  				    fld_valid =  input.value!==undefined && input.value.trim()!="";
+                }
+               
   				var lbl = document.getElementById("fl_s"+section_index+"_f"+field_index);
   				if (fld_valid) {
   					lbl.classList.remove("lbl_invalid");
@@ -413,6 +531,9 @@ class FormWizard {
   nextSection() {
   	this.showSection(this.current_section+1);
   }
+  
+  
+ 
   
  
   
@@ -466,7 +587,11 @@ class FormWizard {
   			btn.classList.remove("bc_btn_invalid");
   		}	
   	}
+    
+    
   } 
+  
+
   
   readValues() {
   	for (var section_index =0;section_index<  this.model["formWizardObject"].section.length; section_index++) {
@@ -476,7 +601,11 @@ class FormWizard {
   			var field = section.field[field_index];
   			if (field.manuscript === undefined || field.manuscript.toLowerCase()=="false") {
   		 		if (field.show_on_condition === undefined || this.isConditionValid(this.conditions[field.show_on_condition])) {
-  					section.field[field_index].value = document.getElementById("fi_s"+section_index+"_f"+field_index).value;
+                    if (field.rb){
+                        section.field[field_index].value = this.readRbFieldValue(section_index,field_index);
+                    } else {
+  					    section.field[field_index].value = document.getElementById("fi_s"+section_index+"_f"+field_index).value;
+                    }
   				} else {
   					section.field[field_index].value = undefined;
   				}
@@ -543,7 +672,7 @@ addDomQRs = function(model){
 // you need to include jspdf package if you want to use this part (https://parall.ax/products/jspdf)
 // you need to include qrcodejs package if you want to add the QR's (https://github.com/davidshimjs/qrcodejs)
 // logo should be a 45x30 mm base64 encoded jpeg or "undefined"
-savePdf = function(model, font, total_column, logo, add_qr_text, file_name ){
+savePdf = function(model, font, total_column, logo, add_qr_text, file_name, server_url, server_post_data ){
 
    if (add_qr_text!=undefined) {
    		addDomQRs(model);  
@@ -697,7 +826,7 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name ){
 	  }
   	}
   	
-setTimeout(function() {
+  setTimeout(function() {
 	if (add_qr_text!=undefined) {
 		for (section_index in model["formWizardObject"].section) {
 			if (section_index % 6==0){
@@ -716,7 +845,21 @@ setTimeout(function() {
 	if (file_name!==undefined){
     	 doc.save(file_name);
    	}
-   	},200);
+    
+    if (server_url!==undefined){
+        if (server_post_data===undefined){
+            server_post_data = {'pdf':''};
+        }
+        
+    	var uri = doc.output('datauristring');
+        server_post_data['pdf'] = uri;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", server_url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(server_post_data));
+   	}
+    
+  },200);
     
 	
 	

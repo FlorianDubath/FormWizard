@@ -16,9 +16,10 @@
   	var model = {
   "formWizardObject": {
     "title": "Example 1",
-    "description": "We create this form in order to test the functionality of this package. This was kind to fill it.",
+    "description": "Test of the different functionality.",
     "version": "0.0.1",
-    "creation_date": "2019-12-25",
+    "creation_date": "2020-04-27",
+    "hide_wizzard_numbering":"false",
     
     "list":[ {
       "name": "Country",
@@ -41,78 +42,129 @@
     
     "section": [
       {
-        "title": "Identification",
-        "description":"Identity of the person",
+        "title": "Section Title",
+        "description":"Description",
         "image":"logo.png",
         "field": [
           {
-            "label": "Name",
+            "label": "Inline text",
             "type": "string",
             "mandatory": "False"
           },
           {
-            "label": "Last Name",
-            "type": "String",
-            "mandatory": "True"
+            "label": "Large Text",
+            "type": "text",
+            "mandatory": "False"
           },
           {
-            "label": "Birth Date",
+            "label": "Date",
             "type": "date",
-            "mandatory": "True"
+            "mandatory": "False"
+          },
+          {
+            "label": "List",
+            "type": "Country",
+            "mandatory": "False"            
+            
+          },
+          {
+            "label": "Radio button",
+            "type": "Country",
+            "rb": "True",
+            "mandatory": "False"            
+            
           }
         ]
       },
       {
-        "title": "Address",
-        "description":"Where the person lives",
+        "title": "Mandatoryness",
+        "description":"Have mandatory field with * and blocking progression",
         "field": [
           {
-            "label": "Street and Number",
+            "label": "Inline text",
             "type": "string",
             "mandatory": "True"
           },
           {
-            "label": "ZIP Code",
-            "type": "string",
-            "value":"1200",
+            "label": "Large Text",
+            "type": "text",
             "mandatory": "True"
           },
           {
-            "label": "Country",
+            "label": "Date",
+            "type": "date",
+            "mandatory": "True"
+          },
+          {
+            "label": "List",
             "type": "Country",
-            "mandatory": "True",
+            "mandatory": "True"            
+            
+          },
+          {
+            "label": "Radio button",
+            "type": "Country",
+            "rb": "True",
+            "mandatory": "True"   
+          }
+        ]
+      },
+      {
+        "title": "Condition",
+        "description":"Test conditional questions",
+        "field": [
+          {
+            "label": "Select Switzerland",
+            "type": "Country",
+            "mandatory": "False",            
             "condition": {
             	"name": "country_CH",
             	"value_true":"Switzerland"
             }
           },  
           {
-            "label": "Comunication language",
+            "label": "Primary language (optional)",
+            "type": "Language",
+            "mandatory": "False",
+            "show_on_condition":"country_CH"
+          },  
+          {
+            "label": "Comunication language (mandatory)",
             "type": "Language",
             "mandatory": "True",
             "show_on_condition":"country_CH"
           },
-          
+           {
+            "label": "Select France",
+            "type": "Country",
+            "mandatory": "False", 
+            "rb": "True",           
+            "condition": {
+            	"name": "country_FR",
+            	"value_true":"France"
+            }
+          }, 
+          {
+            "label": "Departement",
+            "type": "string",
+            "mandatory": "True",
+            "show_on_condition":"country_FR"
+          },
           
         ]
       },
       {
         "title": "More",
-        "description":"Let us know about you",
+        "description":"Manuscript fields and others. Not tested here: add a server url and post data as an object and the generated PDF will be sent to your server",
         "field": [
           {
-            "label": "Your opinion",
-            "type": "text",
+            "label": "Inline text",
+            "pdflabel": "Alternate text into the PDF",
+            "type": "string",
             "mandatory": "True"
           },
           {
-            "label": "Date",
-            "type": "string",
-            "mandatory": "True",
-            "manuscript":"True",
-            }, 
-            {
-            "label": "Signature",
+            "label": "Signature (Manuscript)",
             "type": "string",
             "mandatory": "True",
             "manuscript":"True",
@@ -138,7 +190,8 @@ var trad = {
 var qr_text = "This page contains the same information than the previous ones but encoded in a way that speed up our work as we can scan the QRs to get the information you entered.";
 
 var form_wizard = new FormWizard("container", 
-                                  model, 
+                                  model,
+                                  './', 
                                   trad, 
                                   function(){alert('Exited!');}, 
                                   function(completed_model){savePdf(completed_model, 'helvetica', 2, logo_data, qr_text, 'test.pdf' );alert('Completed!');}

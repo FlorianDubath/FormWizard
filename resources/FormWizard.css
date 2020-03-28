@@ -20,6 +20,7 @@
 	background-color:#DDDDFF;
 	padding:3px 10px 3px 10px;
 	margin:0px 3px 5px 3px;
+	min-height:10px;
 }
 
 .bc_btn:hover,.bc_btn:active{
@@ -124,6 +125,11 @@
 
 .fld{
 	margin-bottom:10px;
+	font-size:20px;
+}
+
+.radio{
+    margin-right:10px;
 }
 
 .cond_excluded{
@@ -145,4 +151,5 @@
 .qr{
 	display:none;
 }
+
 
