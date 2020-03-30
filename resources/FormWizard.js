@@ -672,7 +672,7 @@ addDomQRs = function(model){
 // you need to include jspdf package if you want to use this part (https://parall.ax/products/jspdf)
 // you need to include qrcodejs package if you want to add the QR's (https://github.com/davidshimjs/qrcodejs)
 // logo should be a 45x30 mm base64 encoded jpeg or "undefined"
-savePdf = function(model, font, total_column, logo, add_qr_text, file_name, server_url, server_post_data ){
+savePdf = function(model, font, total_column, logo, add_qr_text, file_name, server_url, server_post_data, callback ){
 
    if (add_qr_text!=undefined) {
    		addDomQRs(model);  
@@ -856,6 +856,16 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name, serv
         var xhr = new XMLHttpRequest();
         xhr.open("POST", server_url, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function(){
+            if (xhr.readyState==4)   {
+                if (xhr.status=='200'){
+                    callback();
+                } else {
+                    alert("Une erreur de communication c'est produite: ".xhr.status);
+                }
+                
+            } 
+        };
         xhr.send(JSON.stringify(server_post_data));
    	}
     
