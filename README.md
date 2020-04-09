@@ -19,4 +19,6 @@ A function is provided to convert the json completed with user-provided values i
 * Fields can be display only if a given condition is meet
 
 ## More
-Play with the test.html...
+* Play with the test.html... you may hove to access it throug a web server due to cross requests bloqued by the browser
+* PHP class for edit the json model file
+

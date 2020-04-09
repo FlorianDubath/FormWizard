@@ -20,6 +20,13 @@ function array_move_elem($array, $from, $to) {
     return $array;
 }
 
+
+// TODO: missing 
+//          - header info (description/version/creation_date)
+//          - manuscript fields
+//          - pdflabel for fields
+//          - condition definition and usage 
+
 class FormWizardConfig {
     // property declaration
     public $storage_path = '';
