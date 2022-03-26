@@ -504,7 +504,7 @@ class FormWizard {
   	 if (btn_end.addEventListener) {
         	btn_end.addEventListener('click', function() {
         	    if (this.form_wizard.trad.exit_confirm!==undefined){
-        	    	window.createValidate(this.form_wizard.trad.exit_confirm, this.form_wizard.completed, function(){});
+        	    	window.createValidate(this.form_wizard.trad.exit_confirm, this.form_wizard.completed.bind(this.form_wizard), function(){});
                 } else {
             	    this.form_wizard.completed();
                 }
@@ -512,7 +512,7 @@ class FormWizard {
      } else if (btn_end.attachEvent) {
         	btn_end.attachEvent('onclick', function() {
                 if (this.form_wizard.trad.exit_confirm!==undefined){
-        	    	window.createValidate(this.form_wizard.trad.exit_confirm, this.form_wizard.completed, function(){});
+        	    	window.createValidate(this.form_wizard.trad.exit_confirm, this.form_wizard.completed.bind(this.form_wizard), function(){});
                 } else {
             	    this.form_wizard.completed();
                 }
