@@ -85,7 +85,7 @@ class FormWizard {
     this.initialize();
     this.showSection(0);
     if (trad.open != undefined) {
-        alert(trad.open);
+        this.createModal(trad.open);
     }
     
     
@@ -94,6 +94,21 @@ class FormWizard {
     };  
     
   }
+  
+  createModal(text, hascancel=false) {
+  
+      var div_glassPane = document.createElement("div");
+      var content =" <div class=\"popmod\" id=\"popmod\" > <div class=\"pop_cont\"> <div class=\"pop_text\" id=\"poptxt\"> "+text+"</div><div class=\"pop_btn\" id=\"popok\" title=\"OK\" onClick=\" var mod = document.getElementById('popmod'); mod.parentElement.removeChild(mod);\">OK</div>";
+      if (hascancel) {
+         content += "<div class=\"pop_btn\" id=\"popcancel\" title=\"Cancel\" >Cancel</div>   ";
+       }             
+               
+       content += " </div></div>";
+    
+     div_glassPane.innerHTML = content
+    document.body.appendChild(div_glassPane)
+  }
+   
   
   normalizeModel() {
   	// list
@@ -631,7 +646,7 @@ class FormWizard {
     	valid &= this.isSectionValid(section_index);
     }
   	if (!valid) {
-  		alert(this.trad.incomplete)
+  		this.createModal(this.trad.incomplete);
   	} else {
   		this.readValues();
         window.onbeforeunload = function() {
@@ -860,7 +875,7 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name, serv
                 if (xhr.status=='200'){
                     callback();
                 } else {
-                    alert("Une erreur de communication c'est produite: ".xhr.status);
+                    this.createModal("Une erreur de communication c'est produite: ".xhr.status);
                 }
                 
             } 

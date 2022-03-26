@@ -153,3 +153,37 @@
 }
 
 
+.popmod {
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    height:100%;
+    width:100%;
+    background-color: rgba(0, 0, 0, 0.5)
+}
+
+
+.pop_cont {
+    background-color: white;
+    margin: 40px;
+    padding: 10px;
+    border: solid 2px black;
+}
+
+.pop_text{display:block;
+margin-bottom:30px;}
+
+.pop_btn {display:inline-block;
+	border: solid 1px blue;
+	border-radius: 20px;
+	background-color:#DDDDFF;
+	padding:3px 10px 3px 10px;
+	margin:0px 3px 5px 3px;
+	min-height:10px;}
+
+
+
+
+
