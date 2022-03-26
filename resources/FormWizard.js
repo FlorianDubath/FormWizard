@@ -684,7 +684,7 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name, serv
 	}
 	
 	
-	var doc = new jsPDF('p','mm','a4');
+	var doc = new window.jspdf.jsPDF('p','mm','a4');
 	
 	const margin_top = 30;
 	const line_height = 5.5;
@@ -783,23 +783,22 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name, serv
 		}
 	}
 	
-    doc.setLineWidth(0.1)
-	doc.setFont(font);
-	doc.setFontType('bold');
+        doc.setLineWidth(0.1)
+	doc.setFont(font,"bold");
 	doc.setFontSize(12);
 	addCentered(model["formWizardObject"].title, 2*column_width + column_separation);
 	doc.setFontSize(10);
-  	doc.setFontType('normal');
+  	doc.setFont(font,'normal');
 	addCentered(model["formWizardObject"].description, column_width);
 	line_number+=1;
 	var section_index;
   	for (section_index in model["formWizardObject"].section) {
   	   var section = model["formWizardObject"].section[section_index];
-	   doc.setFontType('bold');
+	   doc.setFont(font,'bold');
 	   line_number+=0.5;
 	   addColSpanElement( section.title, total_column, false);
        
-  	   doc.setFontType('normal');
+  	   doc.setFont(font,'normal');
        if (section.show_description!==undefined){ 
 	    addColSpanElement( section.description, total_column, false);
        }
@@ -838,7 +837,7 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name, serv
    			var imgData = document.getElementById("qr_s"+section_index).getElementsByTagName('img')[0].src;
    			var line = Math.floor((section_index % 6) / 2);
    			var col = (section_index % 6) % 2;
-            doc.addImage(imgData, 'PNG', 29 + col*(70 + 10), 50 + line*(70 + 10), 70, 70);
+            doc.addImage(imgData, 'JPEG', 29 + col*(70 + 10), 50 + line*(70 + 10), 70, 70);
         } 
    	}
    		 
