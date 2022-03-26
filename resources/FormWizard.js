@@ -1,3 +1,42 @@
+  window.createModal = function(text) {
+  
+      var div_glassPane = document.createElement("div");
+      var content =" <div class=\"popmod\" id=\"popmod\" > <div class=\"pop_cont\"> <div class=\"pop_text\" id=\"poptxt\"> "+text+"</div><div class=\"pop_btn\" id=\"popok\" title=\"OK\" onClick=\" var mod = document.getElementById('popmod'); mod.parentElement.removeChild(mod);\">OK</div>";  
+       content += " </div></div>";
+    
+     div_glassPane.innerHTML = content
+    document.body.appendChild(div_glassPane)
+  }
+  
+  
+ window.createValidate = function(text, yes_callback, no_callback) {
+  
+      var div_glassPane = document.createElement("div");
+      var content =" <div class=\"popmod\" id=\"popmod\" > <div class=\"pop_cont\"> <div class=\"pop_text\" id=\"poptxt\"> "+text+"</div><div class=\"pop_btn\" id=\"popyes\" title=\"Yes\" >Yes</div>";
+     
+       content += "<div class=\"pop_btn\" id=\"popno\" title=\"No\" >No</div>   ";
+   
+       content += " </div></div>";
+    
+     div_glassPane.innerHTML = content
+     document.body.appendChild(div_glassPane)  
+     
+      if ( document.getElementById("popyes").addEventListener) {
+     
+     	document.getElementById("popyes").addEventListener("click",function(){var mod = document.getElementById('popmod'); mod.parentElement.removeChild(mod);yes_callback();});
+     	document.getElementById("popno").addEventListener("click",function(){var mod = document.getElementById('popmod'); mod.parentElement.removeChild(mod);no_callback();});
+     }  else if (document.getElementById("popyes").attachEvent) {
+        	document.getElementById("popyes").attachEvent('onclick',function(){var mod = document.getElementById('popmod'); mod.parentElement.removeChild(mod);yes_callback();});
+              document.getElementById("popno").attachEvent("onclick",function(){var mod = document.getElementById('popmod'); mod.parentElement.removeChild(mod);no_callback();});
+     }
+    
+  } 
+  
+  window.doshowSec  = function (instance,index) {
+     instance.doShowSection(index);
+  }
+  
+
 
 class BcButton {
 	constructor(form_wizard, index) {
@@ -72,7 +111,7 @@ class FormWizard {
     if (trad !== undefined && trad.exit_confirm != undefined) {
     	this.trad.exit_confirm = trad.exit_confirm;
     } else {
-    	this.trad.close = undefined;
+    	this.trad.exit_confirm = undefined;
     }
     
     this.show_section_numbering = true;
@@ -85,7 +124,7 @@ class FormWizard {
     this.initialize();
     this.showSection(0);
     if (trad.open != undefined) {
-        this.createModal(trad.open);
+        window.createModal(trad.open);
     }
     
     
@@ -95,19 +134,7 @@ class FormWizard {
     
   }
   
-  createModal(text, hascancel=false) {
-  
-      var div_glassPane = document.createElement("div");
-      var content =" <div class=\"popmod\" id=\"popmod\" > <div class=\"pop_cont\"> <div class=\"pop_text\" id=\"poptxt\"> "+text+"</div><div class=\"pop_btn\" id=\"popok\" title=\"OK\" onClick=\" var mod = document.getElementById('popmod'); mod.parentElement.removeChild(mod);\">OK</div>";
-      if (hascancel) {
-         content += "<div class=\"pop_btn\" id=\"popcancel\" title=\"Cancel\" >Cancel</div>   ";
-       }             
-               
-       content += " </div></div>";
-    
-     div_glassPane.innerHTML = content
-    document.body.appendChild(div_glassPane)
-  }
+
    
   
   normalizeModel() {
@@ -477,9 +504,7 @@ class FormWizard {
   	 if (btn_end.addEventListener) {
         	btn_end.addEventListener('click', function() {
         	    if (this.form_wizard.trad.exit_confirm!==undefined){
-                    if (confirm(this.form_wizard.trad.exit_confirm)){
-            	        this.form_wizard.completed();
-                   	 }
+        	    	window.createValidate(this.form_wizard.trad.exit_confirm, this.form_wizard.completed, function(){});
                 } else {
             	    this.form_wizard.completed();
                 }
@@ -487,9 +512,7 @@ class FormWizard {
      } else if (btn_end.attachEvent) {
         	btn_end.attachEvent('onclick', function() {
                 if (this.form_wizard.trad.exit_confirm!==undefined){
-                    if (confirm(this.form_wizard.trad.exit_confirm)){
-            	        this.form_wizard.completed();
-                   	 }
+        	    	window.createValidate(this.form_wizard.trad.exit_confirm, this.form_wizard.completed, function(){});
                 } else {
             	    this.form_wizard.completed();
                 }
@@ -558,11 +581,20 @@ class FormWizard {
       // when invalid ask for completion
        const valid = this.isSectionValid(this.current_section);
        if (!valid && this.current_section < section_index) {
-       	 if (confirm(this.trad.emptySection)){
-       	 	return;
-       	 }
+         window.createValidate(this.trad.emptySection, function(){}, function(){this.doShowSection(section_index);}.bind(this));
+       	
+       }else {
+           this.doShowSection(section_index);
        }
-  		document.getElementById("sec_"+this.current_section).classList.add("sect_hidden");
+    } else {
+        this.doShowSection(section_index);
+   }
+
+  }
+      
+   doShowSection(section_index){
+       if (this.current_section>=0) {
+  	   document.getElementById("sec_"+this.current_section).classList.add("sect_hidden");
   	}
   	
   	if (section_index==this.model["formWizardObject"].section.length-1) {
@@ -632,12 +664,9 @@ class FormWizard {
 
   
    close(){
-  	if (confirm(this.trad.close)){
-        window.onbeforeunload = function() {
-            return;
-        };
-  		this.exit_callback();
-  	} 
+    let message = this.trad.close;
+    let callbk = this.exit_callback
+        window.createValidate(message, function() { window.onbeforeunload = function() {return; };callbk();}, function(){});
   } 
   
   completed(){
@@ -646,7 +675,7 @@ class FormWizard {
     	valid &= this.isSectionValid(section_index);
     }
   	if (!valid) {
-  		this.createModal(this.trad.incomplete);
+  		window.createModal(this.trad.incomplete);
   	} else {
   		this.readValues();
         window.onbeforeunload = function() {
@@ -875,7 +904,7 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name, serv
                 if (xhr.status=='200'){
                     callback();
                 } else {
-                    this.createModal("Une erreur de communication c'est produite: ".xhr.status);
+                    window.createModal("Une erreur de communication c'est produite: ".xhr.status);
                 }
                 
             } 
