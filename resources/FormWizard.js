@@ -891,11 +891,14 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name, serv
     
     if (server_url!==undefined){
         if (server_post_data===undefined){
-            server_post_data = {'pdf':''};
+            server_post_data = {'pdf':'', 'data':''};
         }
         
     	var uri = doc.output('datauristring');
         server_post_data['pdf'] = uri;
+        
+        server_post_data['data'] =JSON.stringify(model);
+        
         var xhr = new XMLHttpRequest();
         xhr.open("POST", server_url, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
