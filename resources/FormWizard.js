@@ -134,7 +134,11 @@ class FormWizard {
     
   }
   
-
+  
+  insertLineBreak(text){
+      return text.replace(/(?:\r\n|\r|\n)/g, '<br>');
+  }
+  
    
   
   normalizeModel() {
@@ -438,8 +442,8 @@ class FormWizard {
             sect_div.appendChild(dom_img);
         }
   	 	if (section.description!==undefined && section.description!="") {
-  	 	var sect_descr = document.createElement("div");
-  	 		sect_descr.appendChild(document.createTextNode(section.description));
+ 	        var sect_descr = document.createElement("div");
+  	 		sect_descr.innerHTML = this.insertLineBreak(section.description);
   	 		sect_descr.classList.add("sect_descr");
   	 		sect_div.appendChild(sect_descr);
   	 	}
@@ -634,6 +638,8 @@ class FormWizard {
   			btn.classList.remove("bc_btn_invalid");
   		}	
   	}
+  	
+  	window.scrollTo(0, 0);
     
     
   } 
@@ -896,8 +902,7 @@ savePdf = function(model, font, total_column, logo, add_qr_text, file_name, serv
         
     	var uri = doc.output('datauristring');
         server_post_data['pdf'] = uri;
-        
-        server_post_data['data'] =JSON.stringify(model);
+        server_post_data['data'] = JSON.stringify(model);
         
         var xhr = new XMLHttpRequest();
         xhr.open("POST", server_url, true);
